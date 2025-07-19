@@ -1,7 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import path, { resolve } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [
@@ -18,14 +22,16 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@": resolve(__dirname, "src"), // Adjust if your source files are in src/
+      "@shared": resolve(__dirname, "shared"),
+      "@assets": resolve(__dirname, "attached_assets"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  // Remove root option, so it defaults to the folder with index.html
+  // root: resolve(__dirname), 
+
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: resolve(__dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
