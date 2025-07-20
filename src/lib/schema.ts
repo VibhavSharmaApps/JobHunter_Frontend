@@ -32,6 +32,8 @@ export const JobUrlSchema = z.object({
   status: z.enum(["pending", "applied", "interviewed", "rejected"]),
   createdAt: z.string(),
   userId: z.string(),
+  jobType: z.string().optional(),   // e.g., "Full-time", "Internship"
+workType: z.string().optional(),  // e.g., "Remote", "On-site"
 });
 
 export type JobUrl = z.infer<typeof JobUrlSchema>;

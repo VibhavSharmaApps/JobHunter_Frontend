@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Application } from "@/lib/schema";
 
-export default function useApplications() {
+export function useApplications() {
   return useQuery<Application[]>({
     queryKey: ["applications"],
     queryFn: async () => {
