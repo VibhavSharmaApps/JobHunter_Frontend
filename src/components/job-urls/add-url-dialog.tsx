@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { insertJobUrlSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
+
+import { JobUrlSchema } from "@/lib/schema";
 
 interface AddUrlDialogProps {
   open: boolean;
@@ -20,15 +21,15 @@ export default function AddUrlDialog({ open, onOpenChange }: AddUrlDialogProps) 
   const queryClient = useQueryClient();
 
   const form = useForm({
-    resolver: zodResolver(insertJobUrlSchema.omit({ userId: true })),
-    defaultValues: {
-      url: "",
-      company: "",
-      position: "",
-      location: "",
-      status: "pending",
-    },
-  });
+  resolver: zodResolver(JobUrlSchema.omit({ userId: true })),
+  defaultValues: {
+    url: "",
+    company: "",
+    position: "",
+    location: "",
+    status: "pending",
+  },
+});
 
   const addMutation = useMutation({
     mutationFn: async (data: any) => {

@@ -10,12 +10,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import FileUpload from "@/components/file-upload"; // Import your FileUpload component
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   isOpen: boolean;
   onToggle: () => void;
+  onFileUploaded?: (result: { fileUrl: string; fileId: string; fileName: string }) => void;
 }
 
 const navigationItems = [
@@ -26,7 +28,7 @@ const navigationItems = [
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-export default function Sidebar({ activeTab, onTabChange, isOpen, onToggle }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, isOpen, onToggle, onFileUploaded }: SidebarProps) {
   const isMobile = useIsMobile();
 
   if (isMobile && !isOpen) return null;
@@ -57,6 +59,18 @@ export default function Sidebar({ activeTab, onTabChange, isOpen, onToggle }: Si
               <X className="h-4 w-4" />
             </Button>
           )}
+        </div>
+
+        {/* File Upload Section */}
+        <div className="p-4 border-b border-slate-200">
+          <FileUpload
+            onUploadSuccess={(result) => {
+              onFileUploaded?.(result);
+            }}
+            accept=".pdf,.doc,.docx"
+            maxSize={5}
+            className="w-full"
+          />
         </div>
 
         {/* Navigation Menu */}

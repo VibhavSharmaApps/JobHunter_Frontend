@@ -2,34 +2,47 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { useUserPreferences } from "@/hooks/use-user-preferences";
-import { insertUserPreferencesSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { Edit, Loader2 } from "lucide-react";
 
+import {
+  UserProfileSchema,
+  type UserProfile,
+} from "@/lib/schema";
+
 export default function UserPreferences() {
   const [isEditing, setIsEditing] = useState(false);
-  const { data: preferences, isLoading } = useUserPreferences();
+  const { data: preferences, isLoading, isError } = useUserPreferences();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm({
-    resolver: zodResolver(insertUserPreferencesSchema.omit({ userId: true })),
+  const form = useForm<UserProfile>({
+    resolver: zodResolver(UserProfileSchema),
     defaultValues: {
-      qualifications: "",
-      workExperience: "",
-      jobPreferences: "",
+      education: "",
+      experienceSummary: "",
+      // add other editable fields if needed here
     },
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: UserProfile) => {
       const response = await apiRequest("POST", "/api/user-preferences", data);
+      if (!response.ok) throw new Error("Failed to save preferences");
       return response.json();
     },
     onSuccess: () => {
@@ -49,20 +62,19 @@ export default function UserPreferences() {
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: UserProfile) => {
     saveMutation.mutate(data);
   };
 
-  // Update form values when preferences change - use useEffect to prevent infinite re-renders
   useEffect(() => {
     if (preferences && !isEditing) {
       form.reset({
-        qualifications: preferences.qualifications || "",
-        workExperience: preferences.workExperience || "",
-        jobPreferences: preferences.jobPreferences || "",
+        education: preferences.education || "",
+        experienceSummary: preferences.experienceSummary || "",
+        // reset other editable fields here
       });
     }
-  }, [preferences, isEditing]);
+  }, [preferences, isEditing, form.reset]);
 
   if (isLoading) {
     return (
@@ -74,8 +86,17 @@ export default function UserPreferences() {
           <div className="space-y-4">
             <div className="h-24 bg-slate-200 rounded"></div>
             <div className="h-24 bg-slate-200 rounded"></div>
-            <div className="h-24 bg-slate-200 rounded"></div>
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="text-red-600">
+          Failed to load user preferences.
         </CardContent>
       </Card>
     );
@@ -87,11 +108,7 @@ export default function UserPreferences() {
         <div className="flex items-center justify-between">
           <CardTitle>User Preferences</CardTitle>
           {!isEditing && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
               <Edit className="h-4 w-4 mr-1" />
               Edit
             </Button>
@@ -101,17 +118,17 @@ export default function UserPreferences() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="qualifications"
+                name="education"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Qualifications</FormLabel>
+                    <FormLabel>Education</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Enter your qualifications..."
+                        placeholder="Enter your education details..."
                         rows={4}
                         className="resize-none"
                         disabled={!isEditing}
@@ -124,34 +141,14 @@ export default function UserPreferences() {
 
               <FormField
                 control={form.control}
-                name="workExperience"
+                name="experienceSummary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Work Experience Summary</FormLabel>
+                    <FormLabel>Experience Summary</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         placeholder="Summarize your work experience..."
-                        rows={4}
-                        className="resize-none"
-                        disabled={!isEditing}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="jobPreferences"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Job Preferences</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Describe your job preferences..."
                         rows={4}
                         className="resize-none"
                         disabled={!isEditing}
@@ -170,7 +167,10 @@ export default function UserPreferences() {
                   variant="outline"
                   onClick={() => {
                     setIsEditing(false);
-                    form.reset();
+                    form.reset(preferences ?? {
+                      education: "",
+                      experienceSummary: "",
+                    });
                   }}
                 >
                   Cancel

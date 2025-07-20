@@ -2,9 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { NotebookPen, ClockIcon, UsersIcon, TrendingUpIcon } from "lucide-react";
 
+type Stats = {
+  totalApplications: number;
+  pendingUrls: number;
+  interviews: number;
+  successRate: number;
+};
+
 export default function StatsCards() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<Stats>({
     queryKey: ["/api/stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/stats");
+      if (!res.ok) throw new Error("Failed to fetch stats");
+      return res.json();
+    },
   });
 
   if (isLoading) {
