@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import type { UserProfile } from "@/lib/schema";
+import type { Application } from "@/lib/schema";
 
-export function useUserProfile() {
-  return useQuery<UserProfile>({
-    queryKey: ["user-profile"],
+export default function useApplications() {
+  return useQuery<Application[]>({
+    queryKey: ["applications"],
     queryFn: async () => {
-      const res = await fetch("/api/user-profile");
+      const res = await fetch("/api/applications");  // Your API endpoint
       if (!res.ok) {
-        throw new Error("Failed to fetch user profile");
+        throw new Error("Failed to fetch applications");
       }
-      return (await res.json()) as UserProfile;
+      return (await res.json()) as Application[];
     },
   });
 }

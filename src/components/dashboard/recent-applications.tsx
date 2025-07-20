@@ -1,10 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building } from "lucide-react";
-import { useApplications } from "@/hooks/use-applications";
+import useUserProfile from "@/hooks/use-applications";
 
 export default function RecentApplications() {
-  const { data: applications, isLoading } = useApplications();
+  const { data: applications, isLoading } = useUserProfile();
 
   const recentApplications = applications?.slice(0, 3) || [];
 

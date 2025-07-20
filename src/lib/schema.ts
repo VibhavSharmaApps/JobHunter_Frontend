@@ -35,3 +35,14 @@ export const JobUrlSchema = z.object({
 });
 
 export type JobUrl = z.infer<typeof JobUrlSchema>;
+
+export const ApplicationSchema = z.object({
+  id: z.string(),
+  company: z.string().optional(),
+  position: z.string().optional(),
+  appliedDate: z.string(), // ISO date string
+  status: z.enum(["pending", "interview", "rejected", "accepted"]),
+  // add other fields as needed
+});
+
+export type Application = z.infer<typeof ApplicationSchema>;

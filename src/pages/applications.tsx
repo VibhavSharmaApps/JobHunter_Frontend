@@ -1,9 +1,9 @@
 import React from "react";
-import { useUserProfile } from "@/hooks/use-applications";
+import useUserPreferences from "@/hooks/use-user-preferences";
 
 export default function Applications() {
   // Fetch user profile data (single object)
-  const { data: userProfile, isLoading, isError } = useUserProfile();
+  const { data: userProfile, isLoading, isError } = useUserPreferences();
 
   if (isLoading) {
     return (
