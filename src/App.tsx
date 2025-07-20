@@ -6,7 +6,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import JobCard from "@/components/job-card";
+import { JobCard } from "@/components/job-card";
 
 // Lazy load heavy components
 const Dashboard = React.lazy(() => import("@/pages/dashboard"));
