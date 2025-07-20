@@ -1,5 +1,5 @@
 import React from "react";
-import useUserPreferences from "@/hooks/use-user-preferences";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 
 export default function Applications() {
   // Fetch user profile data (single object)

@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import useUserPreferences from "@/hooks/use-user-preferences";
+import { useUserPreferences } from "@/hooks/use-user-preferences";
 import { apiRequest } from "@/lib/queryClient";
 import { Edit, Loader2 } from "lucide-react";
 

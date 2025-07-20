@@ -32,7 +32,7 @@ export default function UrlManagement() {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/job-urls/${id}`);
     },
     onSuccess: () => {
