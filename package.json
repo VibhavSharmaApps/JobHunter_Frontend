@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-select": "^2.1.7",
     "@radix-ui/react-toast": "^1.2.7",
