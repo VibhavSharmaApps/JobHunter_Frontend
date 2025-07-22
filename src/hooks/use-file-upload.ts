@@ -60,24 +60,47 @@ export function useFileUpload() {
           });
           
           // Upload through backend proxy to avoid SSL/TLS issues
-          const response = await fetch(`${API_BASE_URL}/api/upload/proxy`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
-            },
-            mode: 'cors',
-            credentials: 'omit',
-          });
+          let response: Response;
+          
+          try {
+            console.log('Making fetch request to:', `${API_BASE_URL}/api/upload/proxy`);
+            response = await fetch(`${API_BASE_URL}/api/upload/proxy`, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+              },
+              mode: 'cors',
+              credentials: 'omit',
+            });
 
-          console.log('Response status:', response.status);
-          console.log('Response headers:', response.headers);
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Upload failed with status:', response.status);
-            console.error('Error text:', errorText);
-            throw new Error(`Proxy upload failed: ${response.status} - ${errorText}`);
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error('Upload failed with status:', response.status);
+              console.error('Error text:', errorText);
+              throw new Error(`Proxy upload failed: ${response.status} - ${errorText}`);
+            }
+          } catch (fetchError) {
+            console.error('Fetch error details:', fetchError);
+            
+            const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+            const errorName = fetchError instanceof Error ? fetchError.name : 'Unknown';
+            
+            console.error('Error name:', errorName);
+            console.error('Error message:', errorMessage);
+            
+            if (fetchError instanceof Error) {
+              console.error('Error stack:', fetchError.stack);
+            }
+            
+            if (errorName === 'TypeError' && errorMessage.includes('Failed to fetch')) {
+              throw new Error('Network connection issue. Please check your internet connection and try again.');
+            } else {
+              throw new Error(`Upload failed: ${errorMessage}`);
+            }
           }
 
           const result = await response.json();
