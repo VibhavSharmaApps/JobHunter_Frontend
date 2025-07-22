@@ -3,6 +3,9 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 // Get API base URL from environment
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+// Debug: Log the API base URL
+console.log('API_BASE_URL:', API_BASE_URL);
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -17,6 +20,9 @@ export async function apiRequest(
 ): Promise<Response> {
   // Ensure absolute URL for production
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  
+  // Debug: Log the full URL being requested
+  console.log('Making request to:', fullUrl);
   
   // Get JWT token from localStorage
   const token = localStorage.getItem('jwt_token');
