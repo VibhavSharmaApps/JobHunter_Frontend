@@ -34,6 +34,30 @@ export function useFileUpload() {
         console.log('File type:', file.type);
         console.log('File size:', file.size);
 
+        // Check if user is authenticated
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+          throw new Error('User not authenticated. Please log in again.');
+        }
+        console.log('JWT token found:', token.substring(0, 20) + '...');
+
+        // Test backend connectivity first
+        try {
+          console.log('Testing backend connectivity...');
+          const testResponse = await fetch(`${API_BASE_URL}/api/test-cors`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            mode: 'cors',
+            credentials: 'omit',
+          });
+          console.log('Backend connectivity test status:', testResponse.status);
+        } catch (testError) {
+          console.error('Backend connectivity test failed:', testError);
+          throw new Error('Cannot connect to backend server. Please check your internet connection.');
+        }
+
         // Try proxy upload first (recommended approach)
         try {
           const formData = new FormData();
@@ -42,6 +66,7 @@ export function useFileUpload() {
           formData.append('fileType', file.type);
 
           console.log('Attempting proxy upload...');
+          console.log('Upload URL:', `${API_BASE_URL}/api/upload/proxy`);
           
           // Upload through backend proxy to avoid SSL/TLS issues
           const response = await fetch(`${API_BASE_URL}/api/upload/proxy`, {
@@ -50,10 +75,17 @@ export function useFileUpload() {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
             },
+            mode: 'cors',
+            credentials: 'omit',
           });
+
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
 
           if (!response.ok) {
             const errorText = await response.text();
+            console.error('Upload failed with status:', response.status);
+            console.error('Error text:', errorText);
             throw new Error(`Proxy upload failed: ${response.status} - ${errorText}`);
           }
 

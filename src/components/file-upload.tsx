@@ -64,6 +64,28 @@ export function FileUpload({
     }
   };
 
+  const testBackendConnectivity = async () => {
+    setUploadStatus('Testing backend connectivity...');
+    try {
+      const response = await apiRequest('GET', '/api/test-cors', {});
+      const result = await response.json();
+      setUploadStatus(`Backend connectivity test successful: ${result.message}`);
+    } catch (error) {
+      setUploadStatus(`Backend connectivity test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  const testSimpleR2Connection = async () => {
+    setUploadStatus('Testing simple R2 connection...');
+    try {
+      const response = await apiRequest('GET', '/api/test-r2-connection', {});
+      const result = await response.json();
+      setUploadStatus(`Simple R2 test successful: ${result.message}`);
+    } catch (error) {
+      setUploadStatus(`Simple R2 test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -110,6 +132,22 @@ export function FileUpload({
             size="sm"
           >
             Test R2
+          </Button>
+          
+          <Button
+            onClick={testBackendConnectivity}
+            variant="outline"
+            size="sm"
+          >
+            Test Backend
+          </Button>
+          
+          <Button
+            onClick={testSimpleR2Connection}
+            variant="outline"
+            size="sm"
+          >
+            Test Simple R2
           </Button>
         </div>
 
