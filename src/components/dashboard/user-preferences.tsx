@@ -41,7 +41,7 @@ export default function UserPreferences() {
 
   const saveMutation = useMutation({
     mutationFn: async (data: UserProfile) => {
-      const response = await apiRequest("POST", "/api/user-preferences", data);
+      const response = await apiRequest("PUT", "/api/user-preferences", data);
       if (!response.ok) throw new Error("Failed to save preferences");
       return response.json();
     },
