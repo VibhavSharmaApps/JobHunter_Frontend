@@ -43,7 +43,6 @@ export async function apiRequest(
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
   });
 
   await throwIfResNotOk(res);
@@ -70,7 +69,6 @@ export const getQueryFn: <T>(options: {
     
     const res = await fetch(fullUrl, {
       headers,
-      credentials: "include",
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

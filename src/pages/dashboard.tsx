@@ -3,6 +3,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "@/components/sidebar";
 import StatsCards from "@/components/dashboard/stats-cards";
 import UserPreferences from "@/components/dashboard/user-preferences";
+import UserProfile from "@/components/dashboard/user-profile";
 import RecentApplications from "@/components/dashboard/recent-applications";
 import UrlManagement from "@/components/job-urls/url-management";
 import ApplicationsList from "@/components/applications/applications-list";
@@ -26,6 +27,7 @@ export default function Dashboard() {
               <p className="text-slate-600">Manage your job applications and preferences</p>
             </div>
             <StatsCards />
+            <UserProfile />
             <UserPreferences />
             <RecentApplications />
           </div>

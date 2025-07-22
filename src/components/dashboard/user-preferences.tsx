@@ -20,8 +20,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { Edit, Loader2 } from "lucide-react";
 
 import {
-  UserProfileSchema,
-  type UserProfile,
+  UserPreferencesSchema,
+  type UserPreferencesFormData,
 } from "@/lib/schema";
 
 export default function UserPreferences() {
@@ -30,17 +30,17 @@ export default function UserPreferences() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<UserProfile>({
-    resolver: zodResolver(UserProfileSchema),
+  const form = useForm<UserPreferencesFormData>({
+    resolver: zodResolver(UserPreferencesSchema),
     defaultValues: {
-      education: "",
-      experienceSummary: "",
-      // add other editable fields if needed here
+      qualifications: "",
+      workExperience: "",
+      jobPreferences: "",
     },
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (data: UserProfile) => {
+    mutationFn: async (data: UserPreferencesFormData) => {
       const response = await apiRequest("PUT", "/api/user-preferences", data);
       if (!response.ok) throw new Error("Failed to save preferences");
       return response.json();
@@ -62,16 +62,16 @@ export default function UserPreferences() {
     },
   });
 
-  const onSubmit = (data: UserProfile) => {
+  const onSubmit = (data: UserPreferencesFormData) => {
     saveMutation.mutate(data);
   };
 
   useEffect(() => {
     if (preferences && !isEditing) {
       form.reset({
-        education: preferences.education || "",
-        experienceSummary: preferences.experienceSummary || "",
-        // reset other editable fields here
+        qualifications: preferences.qualifications || "",
+        workExperience: preferences.workExperience || "",
+        jobPreferences: preferences.jobPreferences || "",
       });
     }
   }, [preferences, isEditing, form.reset]);
@@ -84,6 +84,7 @@ export default function UserPreferences() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            <div className="h-24 bg-slate-200 rounded"></div>
             <div className="h-24 bg-slate-200 rounded"></div>
             <div className="h-24 bg-slate-200 rounded"></div>
           </div>
@@ -106,7 +107,7 @@ export default function UserPreferences() {
     <Card className="shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>User Preferences</CardTitle>
+          <CardTitle>Job Preferences</CardTitle>
           {!isEditing && (
             <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
               <Edit className="h-4 w-4 mr-1" />
@@ -121,14 +122,14 @@ export default function UserPreferences() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="education"
+                name="qualifications"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Education</FormLabel>
+                    <FormLabel>Qualifications</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Enter your education details..."
+                        placeholder="Enter your qualifications, certifications, and skills..."
                         rows={4}
                         className="resize-none"
                         disabled={!isEditing}
@@ -141,14 +142,14 @@ export default function UserPreferences() {
 
               <FormField
                 control={form.control}
-                name="experienceSummary"
+                name="workExperience"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Experience Summary</FormLabel>
+                    <FormLabel>Work Experience</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Summarize your work experience..."
+                        placeholder="Describe your work experience and background..."
                         rows={4}
                         className="resize-none"
                         disabled={!isEditing}
@@ -160,6 +161,26 @@ export default function UserPreferences() {
               />
             </div>
 
+            <FormField
+              control={form.control}
+              name="jobPreferences"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Preferences</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Describe your job preferences, desired roles, work environment, salary expectations, etc..."
+                      rows={4}
+                      className="resize-none"
+                      disabled={!isEditing}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {isEditing && (
               <div className="flex justify-end space-x-3">
                 <Button
@@ -168,8 +189,9 @@ export default function UserPreferences() {
                   onClick={() => {
                     setIsEditing(false);
                     form.reset(preferences ?? {
-                      education: "",
-                      experienceSummary: "",
+                      qualifications: "",
+                      workExperience: "",
+                      jobPreferences: "",
                     });
                   }}
                 >
