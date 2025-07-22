@@ -10,6 +10,7 @@ import NotFound from "@/pages/not-found";
 // Lazy load heavy components
 const Dashboard = React.lazy(() => import("@/pages/dashboard"));
 const CVBuilder = React.lazy(() => import("@/pages/cv-builder"));
+const AuthPage = React.lazy(() => import("@/pages/auth"));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -24,6 +25,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/cv-builder" component={CVBuilder} />
+        <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
