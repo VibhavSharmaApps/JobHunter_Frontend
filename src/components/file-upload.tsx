@@ -137,12 +137,13 @@ export function FileUpload({
   const testProxyUpload = async () => {
     setUploadStatus('Testing proxy upload endpoint...');
     try {
-      // Create a simple test file
-      const testFile = new File(['test content'], 'test.txt', { type: 'text/plain' });
+      // Create a simple test PDF file (minimal PDF content)
+      const pdfContent = '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n/Contents 4 0 R\n>>\nendobj\n4 0 obj\n<<\n/Length 44\n>>\nstream\nBT\n/F1 12 Tf\n72 720 Td\n(Test PDF) Tj\nET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000204 00000 n \ntrailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n297\n%%EOF';
+      const testFile = new File([pdfContent], 'test.pdf', { type: 'application/pdf' });
       const formData = new FormData();
       formData.append('file', testFile);
-      formData.append('fileName', 'test.txt');
-      formData.append('fileType', 'text/plain');
+      formData.append('fileName', 'test.pdf');
+      formData.append('fileType', 'application/pdf');
 
       const response = await fetch('https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/upload/proxy', {
         method: 'POST',
