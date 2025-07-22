@@ -4,8 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export function FileUpload() {
+interface FileUploadProps {
+  onUploadSuccess?: (result: { fileUrl: string; fileId: string; fileName: string }) => void;
+  accept?: string;
+  maxSize?: number; // in MB
+  className?: string;
+}
+
+export function FileUpload({ 
+  onUploadSuccess, 
+  accept = ".pdf,.doc,.docx",
+  maxSize = 5,
+  className 
+}: FileUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const uploadMutation = useFileUpload();
@@ -21,10 +34,17 @@ export function FileUpload() {
   const handleUpload = async () => {
     if (!selectedFile) return;
 
+    // Validate file size
+    if (selectedFile.size > maxSize * 1024 * 1024) {
+      setUploadStatus(`File size must be less than ${maxSize}MB`);
+      return;
+    }
+
     setUploadStatus('Uploading...');
     try {
       const result = await uploadMutation.mutateAsync(selectedFile);
       setUploadStatus(`Upload successful! File URL: ${result.fileUrl}`);
+      onUploadSuccess?.(result);
     } catch (error) {
       setUploadStatus(`Upload failed: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -55,21 +75,21 @@ export function FileUpload() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />
           Upload CV
         </CardTitle>
         <CardDescription>
-          Upload your CV in PDF or Word format (max 5MB)
+          Upload your CV in PDF or Word format (max {maxSize}MB)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <input
             type="file"
-            accept=".pdf,.doc,.docx"
+            accept={accept}
             onChange={handleFileSelect}
             className="w-full"
           />

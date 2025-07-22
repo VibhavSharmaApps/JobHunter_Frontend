@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import FileUpload from "@/components/file-upload"; // Import your FileUpload component
+import { FileUpload } from "@/components/file-upload"; // Import your FileUpload component
 
 interface SidebarProps {
   activeTab: string;
