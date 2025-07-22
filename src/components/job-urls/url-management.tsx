@@ -97,8 +97,8 @@ export default function UrlManagement() {
     url.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     url.url.toLowerCase().includes(searchQuery.toLowerCase());
   
-  // Ignore status filtering if no status field
-  return matchesSearch;
+  const matchesStatus = !statusFilter || url.status === statusFilter;
+  return matchesSearch && matchesStatus;
 }) || [];
 
   const getStatusColor = (status: string) => {
@@ -107,7 +107,9 @@ export default function UrlManagement() {
         return "bg-yellow-100 text-yellow-800";
       case "applied":
         return "bg-green-100 text-green-800";
-      case "duplicate":
+      case "interviewed":
+        return "bg-blue-100 text-blue-800";
+      case "rejected":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -168,14 +170,15 @@ export default function UrlManagement() {
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-40">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">All Status</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="applied">Applied</SelectItem>
-                  <SelectItem value="duplicate">Duplicate</SelectItem>
+                  <SelectItem value="interviewed">Interviewed</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -209,6 +212,7 @@ export default function UrlManagement() {
               <th className="text-left py-3 px-4 font-medium text-slate-700">Company</th>
               <th className="text-left py-3 px-4 font-medium text-slate-700">Title</th>
               <th className="text-left py-3 px-4 font-medium text-slate-700">URL</th>
+              <th className="text-left py-3 px-4 font-medium text-slate-700">Status</th>
               <th className="text-left py-3 px-4 font-medium text-slate-700">Date Added</th>
               {/* Removed Status column since 'status' not available */}
               <th className="text-left py-3 px-4 font-medium text-slate-700">Actions</th>
@@ -243,6 +247,11 @@ export default function UrlManagement() {
                   >
                     {url.url.length > 40 ? `${url.url.substring(0, 40)}...` : url.url}
                   </a>
+                </td>
+                <td className="py-3 px-4">
+                  <Badge className={`${getStatusColor(url.status)}`}>
+                    {url.status}
+                  </Badge>
                 </td>
                 <td className="py-3 px-4 text-slate-600 text-sm">
                   {new Date(url.createdAt).toLocaleDateString()}
