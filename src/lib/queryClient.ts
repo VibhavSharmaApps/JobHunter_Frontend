@@ -60,8 +60,12 @@ export async function apiRequest(
   const fetchOptions: RequestInit = {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
   };
+  
+  // Only add body for non-GET/HEAD requests
+  if (data && method !== 'GET' && method !== 'HEAD') {
+    fetchOptions.body = JSON.stringify(data);
+  }
   
   // Only add CORS mode in production
   if (!isDevelopment) {
