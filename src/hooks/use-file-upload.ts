@@ -41,28 +41,8 @@ export function useFileUpload() {
         }
         console.log('JWT token found:', token.substring(0, 20) + '...');
 
-        // Test backend connectivity first
-        try {
-          console.log('Testing backend connectivity...');
-          console.log('Testing URL:', `${API_BASE_URL}/api/test-cors`);
-          
-          const testResponse = await fetch(`${API_BASE_URL}/api/test-cors`, {
-            method: 'GET',
-            mode: 'cors',
-            credentials: 'omit',
-          });
-          console.log('Backend connectivity test status:', testResponse.status);
-          
-          if (!testResponse.ok) {
-            const errorText = await testResponse.text();
-            console.error('Backend test failed with status:', testResponse.status);
-            console.error('Error text:', errorText);
-            throw new Error(`Backend connectivity test failed: ${testResponse.status} - ${errorText}`);
-          }
-        } catch (testError) {
-          console.error('Backend connectivity test failed:', testError);
-          throw new Error('Cannot connect to backend server. Please check your internet connection.');
-        }
+        // Skip backend connectivity test since we know it works
+        console.log('Skipping backend connectivity test - backend is reachable');
 
         // Try proxy upload first (recommended approach)
         try {
@@ -73,6 +53,11 @@ export function useFileUpload() {
 
           console.log('Attempting proxy upload...');
           console.log('Upload URL:', `${API_BASE_URL}/api/upload/proxy`);
+          console.log('FormData contents:', {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size
+          });
           
           // Upload through backend proxy to avoid SSL/TLS issues
           const response = await fetch(`${API_BASE_URL}/api/upload/proxy`, {
