@@ -26,39 +26,143 @@ export function useFileUpload() {
         throw new Error('Only PDF and Word documents are allowed');
       }
 
-      // Get presigned URL from backend
-      const presignedResponse = await apiRequest('POST', '/api/upload/presign', {
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: file.size,
-      });
+      try {
+        console.log('Starting file upload:', file.name);
+        console.log('File type:', file.type);
+        console.log('File size:', file.size);
 
-      const { uploadUrl, fileUrl, fileId } = await presignedResponse.json();
+        // Try proxy upload first (recommended approach)
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('fileName', file.name);
+          formData.append('fileType', file.type);
 
-      // Upload directly to R2 using presigned URL
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
+          console.log('Attempting proxy upload...');
+          
+          // Upload through backend proxy to avoid SSL/TLS issues
+          const response = await fetch('/api/upload/proxy', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+            },
+          });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file');
-      }
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Proxy upload failed: ${response.status} - ${errorText}`);
+          }
 
-      // Confirm upload with backend
-      await apiRequest('POST', '/api/upload/confirm', {
-        fileId,
-        fileName: file.name,
-      });
+          const result = await response.json();
+          
+          console.log('Proxy upload successful');
+          
+          return {
+            fileUrl: result.fileUrl,
+            fileId: result.fileId,
+            fileName: result.fileName,
+          };
+        } catch (proxyError) {
+          console.log('Proxy upload failed, trying presigned URL approach:', proxyError);
+          
+          // Fallback to presigned URL approach
+          const presignedResponse = await apiRequest('POST', '/api/upload/presign', {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+          });
 
-      return {
-        fileUrl,
-        fileId,
-        fileName: file.name,
-      };
+          const { uploadUrl, fileUrl, fileId } = await presignedResponse.json();
+
+          console.log('Attempting direct upload to:', uploadUrl);
+
+          // Try direct upload with multiple strategies
+          let uploadSuccess = false;
+          let uploadError: Error | null = null;
+
+          // Strategy 1: Direct upload with minimal headers
+          try {
+            const uploadResponse = await fetch(uploadUrl, {
+              method: 'PUT',
+              body: file,
+              headers: {
+                'Content-Type': file.type,
+              },
+            });
+
+            if (uploadResponse.ok) {
+              uploadSuccess = true;
+              console.log('Direct upload successful with strategy 1');
+            } else {
+              throw new Error(`Direct upload failed: ${uploadResponse.status}`);
+            }
+          } catch (error) {
+            console.log('Strategy 1 failed:', error);
+            uploadError = error as Error;
+          }
+
+          // Strategy 2: Upload with blob conversion
+          if (!uploadSuccess) {
+            try {
+              const fileBlob = new Blob([file], { type: file.type });
+              const uploadResponse = await fetch(uploadUrl, {
+                method: 'PUT',
+                body: fileBlob,
+                headers: {
+                  'Content-Type': file.type,
+                },
+              });
+
+              if (uploadResponse.ok) {
+                uploadSuccess = true;
+                console.log('Direct upload successful with strategy 2');
+              } else {
+                throw new Error(`Direct upload failed: ${uploadResponse.status}`);
+              }
+            } catch (error) {
+              console.log('Strategy 2 failed:', error);
+              uploadError = error as Error;
+            }
+          }
+
+          if (!uploadSuccess) {
+            // Both proxy and direct upload failed
+            const errorMessage = uploadError?.message || 'Upload failed';
+            if (errorMessage.includes('SSL') || errorMessage.includes('TLS')) {
+              throw new Error('SSL/TLS connection issue. Please try again or contact support.');
+            } else if (errorMessage.includes('Failed to fetch')) {
+              throw new Error('Network connection issue. Please check your internet connection and try again.');
+            } else {
+              throw new Error(`Upload failed: ${errorMessage}`);
+            }
+          }
+
+          // Confirm upload with backend
+          await apiRequest('POST', '/api/upload/confirm', {
+            fileId,
+            fileName: file.name,
+          });
+
+          return {
+            fileUrl,
+            fileId,
+            fileName: file.name,
+          };
+        }
+              } catch (error) {
+          console.error('Upload error details:', error);
+          
+          // Provide more specific error messages
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          if (error instanceof TypeError && errorMessage.includes('Failed to fetch')) {
+            throw new Error('Network connection issue. Please check your internet connection and try again.');
+          } else if (errorMessage.includes('SSL') || errorMessage.includes('TLS')) {
+            throw new Error('SSL/TLS connection issue. Please try again or contact support.');
+          } else {
+            throw error;
+          }
+        }
     },
     onError: (error) => {
       console.error('Upload failed:', error);

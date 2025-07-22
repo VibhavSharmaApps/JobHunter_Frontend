@@ -1,137 +1,124 @@
-import React, { useRef, useState } from 'react';
-import { Upload, FileText, X, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { useFileUpload } from '@/hooks/use-file-upload';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
 
-interface FileUploadProps {
-  onUploadSuccess: (result: { fileUrl: string; fileId: string; fileName: string }) => void;
-  accept?: string;
-  maxSize?: number; // in MB
-  className?: string;
-}
-
-export default function FileUpload({ 
-  onUploadSuccess, 
-  accept = ".pdf,.doc,.docx",
-  maxSize = 5,
-  className 
-}: FileUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragActive, setDragActive] = useState(false);
+export function FileUpload() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
   const uploadMutation = useFileUpload();
-  const { toast } = useToast();
 
-  const handleFiles = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadStatus('');
+    }
+  };
 
-    const file = files[0];
-    
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: `File size must be less than ${maxSize}MB`,
-        variant: "destructive",
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploadStatus('Uploading...');
+    try {
+      const result = await uploadMutation.mutateAsync(selectedFile);
+      setUploadStatus(`Upload successful! File URL: ${result.fileUrl}`);
+    } catch (error) {
+      setUploadStatus(`Upload failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  const testR2Connection = async () => {
+    setUploadStatus('Testing R2 connection...');
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch('/api/test-r2-upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
-      return;
+
+      if (response.ok) {
+        const result = await response.json();
+        setUploadStatus(`R2 test successful: ${result.message}`);
+      } else {
+        const error = await response.text();
+        setUploadStatus(`R2 test failed: ${error}`);
+      }
+    } catch (error) {
+      setUploadStatus(`R2 test error: ${error instanceof Error ? error.message : String(error)}`);
     }
-
-    uploadMutation.mutate(file, {
-      onSuccess: (result) => {
-        toast({
-          title: "Upload successful",
-          description: `${file.name} has been uploaded`,
-        });
-        onUploadSuccess(result);
-      },
-      onError: (error) => {
-        toast({
-          title: "Upload failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    handleFiles(e.dataTransfer.files);
-  };
-
-  const openFileDialog = () => {
-    fileInputRef.current?.click();
   };
 
   return (
-    <div className={cn("w-full", className)}>
-      <div
-        className={cn(
-          "relative border-2 border-dashed rounded-lg p-6 transition-colors",
-          "hover:bg-gray-50 cursor-pointer",
-          dragActive ? "border-primary bg-blue-50" : "border-gray-300",
-          uploadMutation.isPending && "pointer-events-none opacity-50"
-        )}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-        onClick={openFileDialog}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={accept}
-          onChange={(e) => handleFiles(e.target.files)}
-          className="hidden"
-        />
-
-        <div className="flex flex-col items-center justify-center space-y-3">
-          {uploadMutation.isPending ? (
-            <>
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-sm text-gray-600">Uploading...</p>
-            </>
-          ) : uploadMutation.isSuccess ? (
-            <>
-              <CheckCircle className="h-8 w-8 text-green-500" />
-              <p className="text-sm text-green-600">Upload successful!</p>
-            </>
-          ) : (
-            <>
-              <Upload className="h-8 w-8 text-gray-400" />
-              <div className="text-center">
-                <p className="text-sm font-medium text-gray-900">
-                  Drop your CV here, or click to browse
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  PDF, DOC, DOCX up to {maxSize}MB
-                </p>
-              </div>
-            </>
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          Upload CV
+        </CardTitle>
+        <CardDescription>
+          Upload your CV in PDF or Word format (max 5MB)
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={handleFileSelect}
+            className="w-full"
+          />
+          {selectedFile && (
+            <p className="text-sm text-gray-600">
+              Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+            </p>
           )}
         </div>
-      </div>
 
-      {uploadMutation.isPending && (
-        <div className="mt-2 bg-gray-200 rounded-full h-2">
-          <div className="bg-primary h-2 rounded-full animate-pulse w-3/4"></div>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleUpload}
+            disabled={!selectedFile || uploadMutation.isPending}
+            className="flex-1"
+          >
+            {uploadMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
+            Upload CV
+          </Button>
+          
+          <Button
+            onClick={testR2Connection}
+            variant="outline"
+            size="sm"
+          >
+            Test R2
+          </Button>
         </div>
-      )}
-    </div>
+
+        {uploadStatus && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{uploadStatus}</AlertDescription>
+          </Alert>
+        )}
+
+        {uploadMutation.error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {uploadMutation.error.message}
+            </AlertDescription>
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
   );
 }
