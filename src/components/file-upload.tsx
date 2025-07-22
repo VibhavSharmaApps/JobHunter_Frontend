@@ -178,6 +178,17 @@ export function FileUpload({
     }
   };
 
+  const testUserCvsSchema = async () => {
+    setUploadStatus('Testing user_cvs table schema...');
+    try {
+      const response = await apiRequest('GET', '/api/test-user-cvs-schema', {});
+      const result = await response.json();
+      setUploadStatus(`✅ Schema test successful: Columns: ${result.columns?.join(', ')}`);
+    } catch (error) {
+      setUploadStatus(`❌ Schema test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -281,6 +292,14 @@ export function FileUpload({
               size="sm"
             >
               Test Supabase
+            </Button>
+
+            <Button
+              onClick={testUserCvsSchema}
+              variant="outline"
+              size="sm"
+            >
+              Test User CVs Schema
             </Button>
           </div>
         </div>
