@@ -75,6 +75,26 @@ export function FileUpload({
     }
   };
 
+  const testSimpleBackendReachability = async () => {
+    setUploadStatus('Testing simple backend reachability...');
+    try {
+      const response = await fetch('https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/test-cors', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setUploadStatus(`Simple backend test successful: ${result.message}`);
+      } else {
+        setUploadStatus(`Simple backend test failed: ${response.status}`);
+      }
+    } catch (error) {
+      setUploadStatus(`Simple backend test error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   const testSimpleR2Connection = async () => {
     setUploadStatus('Testing simple R2 connection...');
     try {
@@ -172,6 +192,14 @@ export function FileUpload({
             </Button>
             
             <Button
+              onClick={testSimpleBackendReachability}
+              variant="outline"
+              size="sm"
+            >
+              Test Simple Backend
+            </Button>
+            
+            <Button
               onClick={testSimpleR2Connection}
               variant="outline"
               size="sm"
@@ -179,22 +207,22 @@ export function FileUpload({
               Test Simple R2
             </Button>
             
-                      <Button
-            onClick={debugR2Config}
-            variant="outline"
-            size="sm"
-          >
-            Debug R2 Config
-          </Button>
-          
-          <Button
-            onClick={testR2Endpoints}
-            variant="outline"
-            size="sm"
-          >
-            Test R2 Endpoints
-          </Button>
-        </div>
+            <Button
+              onClick={debugR2Config}
+              variant="outline"
+              size="sm"
+            >
+              Debug R2 Config
+            </Button>
+            
+            <Button
+              onClick={testR2Endpoints}
+              variant="outline"
+              size="sm"
+            >
+              Test R2 Endpoints
+            </Button>
+          </div>
         </div>
 
         {uploadStatus && (

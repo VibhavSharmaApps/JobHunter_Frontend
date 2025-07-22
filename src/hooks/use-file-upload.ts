@@ -44,15 +44,21 @@ export function useFileUpload() {
         // Test backend connectivity first
         try {
           console.log('Testing backend connectivity...');
+          console.log('Testing URL:', `${API_BASE_URL}/api/test-cors`);
+          
           const testResponse = await fetch(`${API_BASE_URL}/api/test-cors`, {
             method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
             mode: 'cors',
             credentials: 'omit',
           });
           console.log('Backend connectivity test status:', testResponse.status);
+          
+          if (!testResponse.ok) {
+            const errorText = await testResponse.text();
+            console.error('Backend test failed with status:', testResponse.status);
+            console.error('Error text:', errorText);
+            throw new Error(`Backend connectivity test failed: ${testResponse.status} - ${errorText}`);
+          }
         } catch (testError) {
           console.error('Backend connectivity test failed:', testError);
           throw new Error('Cannot connect to backend server. Please check your internet connection.');
