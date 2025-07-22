@@ -123,11 +123,11 @@ export function FileUpload({
           )}
         </div>
 
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <Button
             onClick={handleUpload}
             disabled={!selectedFile || uploadMutation.isPending}
-            className="flex-1"
+            className="w-full"
           >
             {uploadMutation.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -137,37 +137,39 @@ export function FileUpload({
             Upload CV
           </Button>
           
-          <Button
-            onClick={testR2Connection}
-            variant="outline"
-            size="sm"
-          >
-            Test R2
-          </Button>
-          
-          <Button
-            onClick={testBackendConnectivity}
-            variant="outline"
-            size="sm"
-          >
-            Test Backend
-          </Button>
-          
-          <Button
-            onClick={testSimpleR2Connection}
-            variant="outline"
-            size="sm"
-          >
-            Test Simple R2
-          </Button>
-          
-          <Button
-            onClick={debugR2Config}
-            variant="outline"
-            size="sm"
-          >
-            Debug R2 Config
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={testR2Connection}
+              variant="outline"
+              size="sm"
+            >
+              Test R2
+            </Button>
+            
+            <Button
+              onClick={testBackendConnectivity}
+              variant="outline"
+              size="sm"
+            >
+              Test Backend
+            </Button>
+            
+            <Button
+              onClick={testSimpleR2Connection}
+              variant="outline"
+              size="sm"
+            >
+              Test Simple R2
+            </Button>
+            
+            <Button
+              onClick={debugR2Config}
+              variant="outline"
+              size="sm"
+            >
+              Debug R2 Config
+            </Button>
+          </div>
         </div>
 
         {uploadStatus && (
