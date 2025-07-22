@@ -134,6 +134,38 @@ export function FileUpload({
     }
   };
 
+  const testProxyUpload = async () => {
+    setUploadStatus('Testing proxy upload endpoint...');
+    try {
+      // Create a simple test file
+      const testFile = new File(['test content'], 'test.txt', { type: 'text/plain' });
+      const formData = new FormData();
+      formData.append('file', testFile);
+      formData.append('fileName', 'test.txt');
+      formData.append('fileType', 'text/plain');
+
+      const response = await fetch('https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/upload/proxy', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+        },
+        mode: 'cors',
+        credentials: 'omit',
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setUploadStatus(`✅ Proxy upload test successful: ${result.message}`);
+      } else {
+        const errorText = await response.text();
+        setUploadStatus(`❌ Proxy upload test failed: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      setUploadStatus(`Proxy upload test error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -221,6 +253,14 @@ export function FileUpload({
               size="sm"
             >
               Test R2 Endpoints
+            </Button>
+            
+            <Button
+              onClick={testProxyUpload}
+              variant="outline"
+              size="sm"
+            >
+              Test Proxy Upload
             </Button>
           </div>
         </div>
