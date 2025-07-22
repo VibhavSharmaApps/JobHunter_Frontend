@@ -1,6 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
+// Force the correct API URL since environment variable isn't loading
+const API_BASE_URL = 'https://jobhunter-backend-v2-1020050031271.us-central1.run.app';
+
 interface UploadResponse {
   fileUrl: string;
   fileId: string;
@@ -41,7 +44,7 @@ export function useFileUpload() {
           console.log('Attempting proxy upload...');
           
           // Upload through backend proxy to avoid SSL/TLS issues
-          const response = await fetch('/api/upload/proxy', {
+          const response = await fetch(`${API_BASE_URL}/api/upload/proxy`, {
             method: 'POST',
             body: formData,
             headers: {

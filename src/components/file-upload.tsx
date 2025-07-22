@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { apiRequest } from '@/lib/queryClient';
 
 interface FileUploadProps {
   onUploadSuccess?: (result: { fileUrl: string; fileId: string; fileName: string }) => void;
@@ -53,22 +54,11 @@ export function FileUpload({
   const testR2Connection = async () => {
     setUploadStatus('Testing R2 connection...');
     try {
-      const token = localStorage.getItem('jwt_token');
-      const response = await fetch('/api/test-r2-upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setUploadStatus(`R2 test successful: ${result.message}`);
-      } else {
-        const error = await response.text();
-        setUploadStatus(`R2 test failed: ${error}`);
-      }
+      // Use the apiRequest function to ensure proper URL construction
+      const response = await apiRequest('POST', '/api/test-r2-upload', {});
+      
+      const result = await response.json();
+      setUploadStatus(`R2 test successful: ${result.message}`);
     } catch (error) {
       setUploadStatus(`R2 test error: ${error instanceof Error ? error.message : String(error)}`);
     }
