@@ -86,6 +86,17 @@ export function FileUpload({
     }
   };
 
+  const debugR2Config = async () => {
+    setUploadStatus('Checking R2 configuration...');
+    try {
+      const response = await apiRequest('GET', '/api/debug-r2-config', {});
+      const result = await response.json();
+      setUploadStatus(`R2 Config: Endpoint=${result.endpoint}, Bucket=${result.bucket}, HasKeys=${result.hasAccessKey && result.hasSecretKey}`);
+    } catch (error) {
+      setUploadStatus(`Debug failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -148,6 +159,14 @@ export function FileUpload({
             size="sm"
           >
             Test Simple R2
+          </Button>
+          
+          <Button
+            onClick={debugR2Config}
+            variant="outline"
+            size="sm"
+          >
+            Debug R2 Config
           </Button>
         </div>
 
