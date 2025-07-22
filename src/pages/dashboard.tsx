@@ -44,35 +44,38 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+    <div className="flex h-screen bg-slate-50">
+      {/* Sidebar */}
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
-      
-      <div className="flex-1 overflow-auto">
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
         {isMobile && (
-          <div className="bg-white border-b border-slate-200 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <h1 className="text-lg font-semibold text-slate-900">JobFlow</h1>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </div>
+          <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <span className="text-lg font-semibold text-slate-900">JobFlow</span>
+            <div className="w-10"></div>
           </div>
         )}
 
-        {/* Main Content */}
-        <div className="p-6">
-          {renderTabContent()}
-        </div>
+        {/* Content Area */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6">
+            {renderTabContent()}
+          </div>
+        </main>
       </div>
     </div>
   );

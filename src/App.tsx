@@ -1,6 +1,6 @@
 // App.tsx - Add React.lazy for code splitting
 import React, { Suspense } from 'react';
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,13 +19,35 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Protected Route Component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const [, setLocation] = useLocation();
+  const isAuthenticated = !!localStorage.getItem("jwt_token");
+
+  if (!isAuthenticated) {
+    // Redirect to auth page if not authenticated
+    setLocation("/auth");
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 function Router() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/cv-builder" component={CVBuilder} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/">
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        </Route>
+        <Route path="/cv-builder">
+          <ProtectedRoute>
+            <CVBuilder />
+          </ProtectedRoute>
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>

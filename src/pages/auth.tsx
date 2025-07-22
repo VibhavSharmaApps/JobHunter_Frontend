@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,14 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  // Check if user is already logged in and redirect
+  useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+    if (token) {
+      setLocation("/");
+    }
+  }, [setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +46,14 @@ export default function AuthPage() {
         toast({
           title: "Success!",
           description: isSignup 
-            ? "Account created successfully. You are now logged in." 
-            : "Logged in successfully.",
+            ? "Account created successfully. Redirecting to dashboard..." 
+            : "Logged in successfully. Redirecting to dashboard...",
         });
 
         // Redirect to dashboard
-        setLocation("/");
+        setTimeout(() => {
+          setLocation("/");
+        }, 1000);
       } else {
         throw new Error("No token received");
       }
@@ -108,7 +118,7 @@ export default function AuthPage() {
         <CardHeader>
           <CardTitle className="text-center">JobFlow Authentication</CardTitle>
           <p className="text-center text-slate-600">
-            Sign in to your account or create a new one
+            Sign in to your account or create a new one to continue
           </p>
         </CardHeader>
         <CardContent>
