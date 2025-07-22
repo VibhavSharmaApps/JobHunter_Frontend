@@ -97,6 +97,23 @@ export function FileUpload({
     }
   };
 
+  const testR2Endpoints = async () => {
+    setUploadStatus('Testing multiple R2 endpoints...');
+    try {
+      const response = await apiRequest('GET', '/api/test-r2-endpoints', {});
+      const result = await response.json();
+      
+      const successResults = result.results.filter((r: any) => r.status === 'SUCCESS');
+      if (successResults.length > 0) {
+        setUploadStatus(`✅ Working endpoint found: ${successResults[0].endpoint}`);
+      } else {
+        setUploadStatus(`❌ All endpoints failed. Check account ID and R2 setup.`);
+      }
+    } catch (error) {
+      setUploadStatus(`Endpoint test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -162,14 +179,22 @@ export function FileUpload({
               Test Simple R2
             </Button>
             
-            <Button
-              onClick={debugR2Config}
-              variant="outline"
-              size="sm"
-            >
-              Debug R2 Config
-            </Button>
-          </div>
+                      <Button
+            onClick={debugR2Config}
+            variant="outline"
+            size="sm"
+          >
+            Debug R2 Config
+          </Button>
+          
+          <Button
+            onClick={testR2Endpoints}
+            variant="outline"
+            size="sm"
+          >
+            Test R2 Endpoints
+          </Button>
+        </div>
         </div>
 
         {uploadStatus && (
