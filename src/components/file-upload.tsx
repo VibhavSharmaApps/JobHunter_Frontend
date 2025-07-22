@@ -167,6 +167,17 @@ export function FileUpload({
     }
   };
 
+  const testSupabase = async () => {
+    setUploadStatus('Testing Supabase connection...');
+    try {
+      const response = await apiRequest('GET', '/api/test-supabase', {});
+      const result = await response.json();
+      setUploadStatus(`✅ Supabase test successful: ${result.message}`);
+    } catch (error) {
+      setUploadStatus(`❌ Supabase test failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -262,6 +273,14 @@ export function FileUpload({
               size="sm"
             >
               Test Proxy Upload
+            </Button>
+
+            <Button
+              onClick={testSupabase}
+              variant="outline"
+              size="sm"
+            >
+              Test Supabase
             </Button>
           </div>
         </div>
