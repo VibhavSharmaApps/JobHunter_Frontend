@@ -47,25 +47,11 @@ export default function StatsCards() {
       icon: ClockIcon,
       iconBg: "bg-yellow-50",
       iconColor: "text-warning"
-    },
-    {
-      title: "Interviews",
-      value: stats?.interviews || 0,
-      icon: UsersIcon,
-      iconBg: "bg-green-50",
-      iconColor: "text-accent"
-    },
-    {
-      title: "Success Rate",
-      value: `${stats?.successRate || 0}%`,
-      icon: TrendingUpIcon,
-      iconBg: "bg-emerald-50",
-      iconColor: "text-accent"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {statsData.map((stat, index) => (
         <Card key={index} className="shadow-sm">
           <CardContent className="p-6">

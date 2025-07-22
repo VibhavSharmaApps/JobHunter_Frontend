@@ -23,7 +23,6 @@ interface SidebarProps {
 const navigationItems = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { id: "urls", icon: Link, label: "Job URLs" },
-  { id: "applications", icon: FileText, label: "Applications" },
   { id: "cv-builder", icon: Bot, label: "AI CV Builder" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];
