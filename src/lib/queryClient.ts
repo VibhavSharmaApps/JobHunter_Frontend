@@ -1,10 +1,12 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-// Get API base URL from environment
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// Force the correct API URL since environment variable isn't loading
+const API_BASE_URL = 'https://jobhunter-backend-v2-1020050031271.us-central1.run.app';
 
 // Debug: Log the API base URL
 console.log('API_BASE_URL:', API_BASE_URL);
+console.log('import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('import.meta.env:', import.meta.env);
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -23,6 +25,8 @@ export async function apiRequest(
   
   // Debug: Log the full URL being requested
   console.log('Making request to:', fullUrl);
+  console.log('Original url:', url);
+  console.log('API_BASE_URL:', API_BASE_URL);
   
   // Get JWT token from localStorage
   const token = localStorage.getItem('jwt_token');
