@@ -24,7 +24,7 @@ import {
 export default function UrlManagement() {
   const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [showAddDialog, setShowAddDialog] = useState(false);
   
   const { data: urls, isLoading, error } = useJobUrls();
@@ -100,7 +100,7 @@ export default function UrlManagement() {
     url.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     url.url.toLowerCase().includes(searchQuery.toLowerCase());
   
-  const matchesStatus = !statusFilter || url.status === statusFilter;
+  const matchesStatus = !statusFilter || statusFilter === "all" || url.status === statusFilter;
   return matchesSearch && matchesStatus;
 }) || [];
 
@@ -230,7 +230,7 @@ export default function UrlManagement() {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="applied">Applied</SelectItem>
                   <SelectItem value="interviewed">Interviewed</SelectItem>
