@@ -132,12 +132,51 @@ export default function UrlManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs Management</h1>
-        <p className="text-slate-600">Collect, organize, and manage job opening URLs</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs</h1>
+        <p className="text-slate-600">Search and manage job opportunities</p>
       </div>
 
-      {/* URL Actions Bar */}
+      {/* Search Window */}
       <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="h-5 w-5" />
+            Search Job URLs
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search for job URLs, companies, or positions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-12 text-lg"
+              />
+            </div>
+            <div className="flex justify-center">
+              <Button 
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-white px-8"
+                onClick={() => {
+                  // TODO: Connect to extension for bulk apply functionality
+                  console.log('Bulk Apply clicked - will connect to extension later');
+                }}
+              >
+                <Wand2 className="h-5 w-5 mr-2" />
+                Bulk Apply
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* URL Management Section */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle>Manage Job URLs</CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
@@ -160,15 +199,6 @@ export default function UrlManagement() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                <Input
-                  placeholder="Search URLs..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="All Status" />
