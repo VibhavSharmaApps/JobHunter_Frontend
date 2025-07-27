@@ -9,6 +9,8 @@ import UrlManagement from "@/components/job-urls/url-management";
 import ApplicationsList from "@/components/applications/applications-list";
 import CVBuilderPlaceholder from "@/components/cv-builder/cv-builder-placeholder";
 import SettingsPanel from "@/components/settings/settings-panel";
+import JobPreferencesForm from "@/components/job-preferences/job-preferences-form";
+import JobListingsView from "@/components/job-listings/job-listings-view";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
@@ -30,6 +32,17 @@ export default function Dashboard() {
             <UserProfile />
             <UserPreferences />
             <RecentApplications />
+          </div>
+        );
+      case "job-search":
+        return (
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Job Search</h1>
+              <p className="text-slate-600">Find and apply to matching job opportunities</p>
+            </div>
+            <JobPreferencesForm />
+            <JobListingsView />
           </div>
         );
       case "urls":

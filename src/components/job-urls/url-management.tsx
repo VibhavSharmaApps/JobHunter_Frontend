@@ -31,9 +31,6 @@ export default function UrlManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Debug logging
-  console.log('UrlManagement render:', { urls, isLoading, error });
-
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/job-urls/${id}`);
@@ -132,35 +129,14 @@ export default function UrlManagement() {
     );
   }
 
-  if (error) {
-    console.error('Error loading job URLs:', error);
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs</h1>
-          <p className="text-slate-600">Search and manage job opportunities</p>
-        </div>
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="text-center py-8">
-              <p className="text-red-600 mb-4">Error loading job URLs</p>
-              <Button onClick={() => window.location.reload()}>
-                Retry
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
-  try {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs</h1>
-          <p className="text-slate-600">Search and manage job opportunities</p>
-        </div>
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs</h1>
+        <p className="text-slate-600">Search and manage job opportunities</p>
+      </div>
 
       {/* Search Window */}
       <Card className="shadow-sm">
@@ -351,25 +327,4 @@ export default function UrlManagement() {
       />
     </div>
   );
-  } catch (error) {
-    console.error('Error rendering UrlManagement:', error);
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Job URLs</h1>
-          <p className="text-slate-600">Search and manage job opportunities</p>
-        </div>
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="text-center py-8">
-              <p className="text-red-600 mb-4">Error rendering component</p>
-              <Button onClick={() => window.location.reload()}>
-                Retry
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 }

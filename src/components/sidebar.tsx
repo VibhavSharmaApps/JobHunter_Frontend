@@ -6,11 +6,14 @@ import {
   Bot, 
   Settings,
   Briefcase,
-  X
+  X,
+  User,
+  Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FileUpload } from "@/components/file-upload"; // Import your FileUpload component
+import { useState, useEffect } from "react";
 
 interface SidebarProps {
   activeTab: string;
@@ -22,6 +25,7 @@ interface SidebarProps {
 
 const navigationItems = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { id: "job-search", icon: Search, label: "Job Search" },
   { id: "urls", icon: Link, label: "Job URLs" },
   { id: "cv-builder", icon: Bot, label: "AI CV Builder" },
   { id: "settings", icon: Settings, label: "Settings" },
@@ -29,6 +33,20 @@ const navigationItems = [
 
 export default function Sidebar({ activeTab, onTabChange, isOpen, onToggle, onFileUploaded }: SidebarProps) {
   const isMobile = useIsMobile();
+  const [userProfile, setUserProfile] = useState<{ name?: string; email?: string }>({});
+
+  // Load user profile from localStorage or get from API
+  useEffect(() => {
+    const userEmail = localStorage.getItem("user_email");
+    const userName = localStorage.getItem("user_name");
+    
+    if (userEmail || userName) {
+      setUserProfile({
+        name: userName || "User",
+        email: userEmail || "user@example.com"
+      });
+    }
+  }, []);
 
   if (isMobile && !isOpen) return null;
 
@@ -98,11 +116,21 @@ export default function Sidebar({ activeTab, onTabChange, isOpen, onToggle, onFi
         <div className="flex-shrink-0 p-4 border-t border-slate-200">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">JD</span>
+              {userProfile.name ? (
+                <span className="text-white text-sm font-medium">
+                  {userProfile.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                </span>
+              ) : (
+                <User className="h-4 w-4 text-white" />
+              )}
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-900">John Doe</p>
-              <p className="text-xs text-slate-500">john@example.com</p>
+              <p className="text-sm font-medium text-slate-900">
+                {userProfile.name || "User"}
+              </p>
+              <p className="text-xs text-slate-500">
+                {userProfile.email || "user@example.com"}
+              </p>
             </div>
           </div>
         </div>
