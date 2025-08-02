@@ -12,7 +12,8 @@ import {
   ExternalLink, 
   Rocket,
   CheckSquare,
-  Loader2
+  Loader2,
+  Search
 } from "lucide-react";
 
 // Chrome extension types
@@ -473,13 +474,19 @@ export default function JobListingsView() {
       {jobs.length === 0 && !isLoading && (
         <Card className="shadow-sm">
           <CardContent className="p-12 text-center">
-            <Briefcase className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+            <Search className="h-12 w-12 mx-auto mb-4 text-slate-300" />
             <h3 className="text-lg font-medium text-slate-900 mb-2">
-              No jobs found
+              Sorry, we couldn't find relevant results
             </h3>
-            <p className="text-slate-600">
-              Try adjusting your search criteria or job preferences
+            <p className="text-slate-600 mb-4">
+              No jobs match your current search criteria. Try adjusting your preferences or expanding your search.
             </p>
+            <div className="space-y-2 text-sm text-slate-500 max-w-md mx-auto">
+              <p>• Try different job titles or keywords</p>
+              <p>• Expand your location search area</p>
+              <p>• Remove some filters to see more results</p>
+              <p>• Check back later for new opportunities</p>
+            </div>
           </CardContent>
         </Card>
       )}

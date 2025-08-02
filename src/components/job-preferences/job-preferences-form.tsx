@@ -127,44 +127,20 @@ export default function JobPreferencesForm() {
       if (error instanceof Error && error.name === 'AbortError') {
         toast({
           title: "Search timeout",
-          description: "Search took too long. Using sample jobs for demonstration.",
+          description: "Sorry, we couldn't find relevant results for the settings above. Try adjusting your search criteria.",
           variant: "destructive",
         });
         
-        // Use mock data as fallback
-        const mockJobs = [
-          {
-            id: "mock_1",
-            title: "Sample Job 1",
-            company: "Sample Company",
-            location: "Remote",
-            url: "https://example.com/job1",
-            source: "Sample Source",
-            postedDate: new Date().toISOString(),
-            salary: "$50k - $70k",
-            experience: "2+ years"
-          },
-          {
-            id: "mock_2", 
-            title: "Sample Job 2",
-            company: "Another Company",
-            location: "New York, NY",
-            url: "https://example.com/job2",
-            source: "Sample Source",
-            postedDate: new Date().toISOString(),
-            salary: "$60k - $80k",
-            experience: "3+ years"
-          }
-        ];
-        
-        localStorage.setItem('discoveredJobs', JSON.stringify(mockJobs));
+        // Don't set mock data - let the empty state show
+        localStorage.removeItem('discoveredJobs');
         
       } else {
         toast({
-          title: "Error",
-          description: "Failed to search for jobs. Please try again.",
+          title: "Search failed",
+          description: "Sorry, we couldn't find relevant results for the settings above. Please try again later.",
           variant: "destructive",
         });
+        localStorage.removeItem('discoveredJobs');
       }
     } finally {
       setIsSearching(false);
