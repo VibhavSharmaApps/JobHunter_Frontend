@@ -60,6 +60,16 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
   const [newCertification, setNewCertification] = useState("");
   const { toast } = useToast();
 
+  // Debug: Check authentication status
+  const token = localStorage.getItem('jwt_token');
+  const userEmail = localStorage.getItem('user_email');
+  
+  console.log('UserProfileForm Debug:', {
+    hasToken: !!token,
+    userEmail,
+    tokenLength: token?.length || 0
+  });
+
   const form = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
     defaultValues: {
@@ -87,8 +97,13 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
 
   const loadProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+      const token = localStorage.getItem('jwt_token');
+      console.log('Loading profile with token:', token ? 'Token exists' : 'No token');
+      
+      if (!token) {
+        console.log('No JWT token found in localStorage');
+        return;
+      }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
         headers: {
@@ -97,6 +112,8 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         },
       });
 
+      console.log('Profile response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
         const profile = data.profile;
@@ -133,8 +150,11 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
   const onSubmit = async (data: UserProfile) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('jwt_token');
+      console.log('Submitting profile with token:', token ? 'Token exists' : 'No token');
+      
       if (!token) {
+        console.log('No JWT token found for profile submission');
         toast({
           title: "Authentication required",
           description: "Please log in to save your profile.",
@@ -160,6 +180,8 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         body: JSON.stringify(profileData),
       });
 
+      console.log('Profile submission response status:', response.status);
+      
       if (response.ok) {
         toast({
           title: "Profile saved!",
@@ -168,6 +190,7 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         onSave?.(profileData);
       } else {
         const errorData = await response.json();
+        console.log('Profile save error:', errorData);
         toast({
           title: "Error saving profile",
           description: errorData.error || "Failed to save profile. Please try again.",
@@ -244,6 +267,18 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Info:</h3>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>Token exists: {token ? 'Yes' : 'No'}</div>
+            <div>User email: {userEmail || 'Not set'}</div>
+            <div>Token length: {token?.length || 0}</div>
+          </div>
+        </div>
+      )}
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
