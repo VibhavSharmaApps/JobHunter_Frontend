@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,7 +38,7 @@ interface JobListing {
   experience?: string;
 }
 
-// Mock data for demonstration
+// Mock data for demonstration - diverse sources
 const mockJobListings: JobListing[] = [
   {
     id: "1",
@@ -94,6 +94,83 @@ const mockJobListings: JobListing[] = [
     postedDate: "2024-01-11",
     salary: "$90k - $120k",
     experience: "3+ years"
+  },
+  {
+    id: "6",
+    title: "React Developer",
+    company: "Netflix",
+    location: "Los Gatos, CA",
+    url: "https://jobs.netflix.com/jobs/123456",
+    source: "Company Career Page",
+    postedDate: "2024-01-10",
+    salary: "$150k - $200k",
+    experience: "3+ years"
+  },
+  {
+    id: "7",
+    title: "Backend Engineer",
+    company: "Stripe",
+    location: "San Francisco, CA",
+    url: "https://stripe.com/jobs/backend-engineer",
+    source: "Company Career Page",
+    postedDate: "2024-01-09",
+    salary: "$140k - $180k",
+    experience: "4+ years"
+  },
+  {
+    id: "8",
+    title: "Data Scientist",
+    company: "OpenAI",
+    location: "Remote",
+    url: "https://openai.com/careers/data-scientist",
+    source: "Company Career Page",
+    postedDate: "2024-01-08",
+    salary: "$160k - $220k",
+    experience: "5+ years"
+  },
+  {
+    id: "9",
+    title: "Mobile Developer",
+    company: "Uber",
+    location: "San Francisco, CA",
+    url: "https://www.uber.com/careers/mobile-developer",
+    source: "Company Career Page",
+    postedDate: "2024-01-07",
+    salary: "$130k - $170k",
+    experience: "3+ years"
+  },
+  {
+    id: "10",
+    title: "Frontend Engineer",
+    company: "Airbnb",
+    location: "Remote",
+    url: "https://careers.airbnb.com/frontend-engineer",
+    source: "Company Career Page",
+    postedDate: "2024-01-06",
+    salary: "$120k - $160k",
+    experience: "2+ years"
+  },
+  {
+    id: "11",
+    title: "Machine Learning Engineer",
+    company: "Google",
+    location: "Mountain View, CA",
+    url: "https://careers.google.com/jobs/ml-engineer",
+    source: "Company Career Page",
+    postedDate: "2024-01-05",
+    salary: "$180k - $250k",
+    experience: "5+ years"
+  },
+  {
+    id: "12",
+    title: "DevOps Engineer",
+    company: "Amazon",
+    location: "Seattle, WA",
+    url: "https://amazon.jobs/devops-engineer",
+    source: "Company Career Page",
+    postedDate: "2024-01-04",
+    salary: "$140k - $190k",
+    experience: "4+ years"
   }
 ];
 
@@ -109,6 +186,18 @@ const getSourceIcon = (source: string) => {
       return "🎋";
     case "smartrecruiters":
       return "🧠";
+    case "linkedin":
+      return "💼";
+    case "indeed":
+      return "🔍";
+    case "glassdoor":
+      return "🏢";
+    case "company career page":
+      return "🏭";
+    case "remote job sites":
+      return "🏠";
+    case "startup job boards":
+      return "🚀";
     default:
       return "📋";
   }
@@ -126,6 +215,18 @@ const getSourceColor = (source: string) => {
       return "bg-yellow-100 text-yellow-800";
     case "smartrecruiters":
       return "bg-indigo-100 text-indigo-800";
+    case "linkedin":
+      return "bg-blue-100 text-blue-800";
+    case "indeed":
+      return "bg-purple-100 text-purple-800";
+    case "glassdoor":
+      return "bg-green-100 text-green-800";
+    case "company career page":
+      return "bg-orange-100 text-orange-800";
+    case "remote job sites":
+      return "bg-teal-100 text-teal-800";
+    case "startup job boards":
+      return "bg-pink-100 text-pink-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
@@ -134,7 +235,32 @@ const getSourceColor = (source: string) => {
 export default function JobListingsView() {
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const [isAutoApplying, setIsAutoApplying] = useState(false);
+  const [jobs, setJobs] = useState<JobListing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+
+  // Load discovered jobs from localStorage
+  useEffect(() => {
+    const loadJobs = () => {
+      try {
+        const discoveredJobs = localStorage.getItem('discoveredJobs');
+        if (discoveredJobs) {
+          const parsedJobs = JSON.parse(discoveredJobs);
+          setJobs(parsedJobs);
+        } else {
+          // Fallback to mock data if no discovered jobs
+          setJobs(mockJobListings);
+        }
+      } catch (error) {
+        console.error('Error loading jobs:', error);
+        setJobs(mockJobListings);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadJobs();
+  }, []);
 
   const handleJobSelect = (jobId: string, checked: boolean) => {
     if (checked) {
@@ -145,10 +271,10 @@ export default function JobListingsView() {
   };
 
   const handleSelectAll = () => {
-    if (selectedJobs.length === mockJobListings.length) {
+    if (selectedJobs.length === jobs.length) {
       setSelectedJobs([]);
     } else {
-      setSelectedJobs(mockJobListings.map(job => job.id));
+      setSelectedJobs(jobs.map(job => job.id));
     }
   };
 
@@ -165,10 +291,10 @@ export default function JobListingsView() {
     setIsAutoApplying(true);
     
     try {
-      // Get selected job data
-      const selectedJobData = mockJobListings.filter(job => 
-        selectedJobs.includes(job.id)
-      );
+                 // Get selected job data
+           const selectedJobData = jobs.filter(job => 
+             selectedJobs.includes(job.id)
+           );
 
       // Store job data for extension
       localStorage.setItem('autoApplyJobs', JSON.stringify(selectedJobData));
@@ -221,20 +347,20 @@ export default function JobListingsView() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Job Listings</h2>
-          <p className="text-slate-600">
-            {mockJobListings.length} jobs found • {selectedJobs.length} selected
-          </p>
+                         <p className="text-slate-600">
+                 {jobs.length} jobs found • {selectedJobs.length} selected
+               </p>
         </div>
         
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleSelectAll}
-            className="flex items-center gap-2"
-          >
-            <CheckSquare className="h-4 w-4" />
-            {selectedJobs.length === mockJobListings.length ? "Deselect All" : "Select All"}
-          </Button>
+                           <Button
+                   variant="outline"
+                   onClick={handleSelectAll}
+                   className="flex items-center gap-2"
+                 >
+                   <CheckSquare className="h-4 w-4" />
+                   {selectedJobs.length === jobs.length ? "Deselect All" : "Select All"}
+                 </Button>
           
           <Button
             onClick={handleAutoApply}
@@ -256,83 +382,90 @@ export default function JobListingsView() {
         </div>
       </div>
 
-      {/* Job Listings */}
-      <div className="space-y-4">
-        {mockJobListings.map((job) => (
-          <Card key={job.id} className="shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                {/* Checkbox */}
-                <div className="pt-1">
-                  <Checkbox
-                    checked={selectedJobs.includes(job.id)}
-                    onCheckedChange={(checked) => 
-                      handleJobSelect(job.id, !!checked)
-                    }
-                  />
-                </div>
+                   {/* Job Listings */}
+             <div className="space-y-4">
+               {isLoading ? (
+                 <div className="text-center py-8">
+                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                   <p className="text-slate-600">Loading jobs...</p>
+                 </div>
+               ) : (
+                 jobs.map((job) => (
+                   <Card key={job.id} className="shadow-sm hover:shadow-md transition-shadow">
+                     <CardContent className="p-6">
+                       <div className="flex items-start gap-4">
+                         {/* Checkbox */}
+                         <div className="pt-1">
+                           <Checkbox
+                             checked={selectedJobs.includes(job.id)}
+                             onCheckedChange={(checked) => 
+                               handleJobSelect(job.id, !!checked)
+                             }
+                           />
+                         </div>
 
-                {/* Job Details */}
-                <div className="flex-1 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {job.title}
-                      </h3>
-                      <div className="flex items-center gap-4 mt-1">
-                        <div className="flex items-center gap-1 text-slate-600">
-                          <Building className="h-4 w-4" />
-                          <span className="text-sm">{job.company}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-slate-600">
-                          <MapPin className="h-4 w-4" />
-                          <span className="text-sm">{job.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-slate-600">
-                          <Calendar className="h-4 w-4" />
-                          <span className="text-sm">{formatDate(job.postedDate)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Badge className={getSourceColor(job.source)}>
-                        <span className="mr-1">{getSourceIcon(job.source)}</span>
-                        {job.source}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(job.url, '_blank')}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                         {/* Job Details */}
+                         <div className="flex-1 space-y-3">
+                           <div className="flex items-start justify-between">
+                             <div>
+                               <h3 className="text-lg font-semibold text-slate-900">
+                                 {job.title}
+                               </h3>
+                               <div className="flex items-center gap-4 mt-1">
+                                 <div className="flex items-center gap-1 text-slate-600">
+                                   <Building className="h-4 w-4" />
+                                   <span className="text-sm">{job.company}</span>
+                                 </div>
+                                 <div className="flex items-center gap-1 text-slate-600">
+                                   <MapPin className="h-4 w-4" />
+                                   <span className="text-sm">{job.location}</span>
+                                 </div>
+                                 <div className="flex items-center gap-1 text-slate-600">
+                                   <Calendar className="h-4 w-4" />
+                                   <span className="text-sm">{formatDate(job.postedDate)}</span>
+                                 </div>
+                               </div>
+                             </div>
+                             
+                             <div className="flex items-center gap-2">
+                               <Badge className={getSourceColor(job.source)}>
+                                 <span className="mr-1">{getSourceIcon(job.source)}</span>
+                                 {job.source}
+                               </Badge>
+                               <Button
+                                 variant="ghost"
+                                 size="sm"
+                                 onClick={() => window.open(job.url, '_blank')}
+                               >
+                                 <ExternalLink className="h-4 w-4" />
+                               </Button>
+                             </div>
+                           </div>
 
-                  {/* Additional Info */}
-                  <div className="flex items-center gap-4 text-sm text-slate-600">
-                    {job.salary && (
-                      <div className="flex items-center gap-1">
-                        <Briefcase className="h-4 w-4" />
-                        <span>{job.salary}</span>
-                      </div>
-                    )}
-                    {job.experience && (
-                      <div className="flex items-center gap-1">
-                        <span>Experience: {job.experience}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                           {/* Additional Info */}
+                           <div className="flex items-center gap-4 text-sm text-slate-600">
+                             {job.salary && (
+                               <div className="flex items-center gap-1">
+                                 <Briefcase className="h-4 w-4" />
+                                 <span>{job.salary}</span>
+                               </div>
+                             )}
+                             {job.experience && (
+                               <div className="flex items-center gap-1">
+                                 <span>Experience: {job.experience}</span>
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 ))
+               )}
+             </div>
 
       {/* Empty State */}
-      {mockJobListings.length === 0 && (
+      {jobs.length === 0 && !isLoading && (
         <Card className="shadow-sm">
           <CardContent className="p-12 text-center">
             <Briefcase className="h-12 w-12 mx-auto mb-4 text-slate-300" />
