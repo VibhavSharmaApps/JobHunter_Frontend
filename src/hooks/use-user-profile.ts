@@ -49,13 +49,13 @@ export function useUserProfile() {
     setError(null);
     
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('jwt_token');
       if (!token) {
         setError('No authentication token found');
         return;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
+      const response = await fetch(`/api/user/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -86,13 +86,13 @@ export function useUserProfile() {
     setError(null);
     
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('jwt_token');
       if (!token) {
         setError('No authentication token found');
         return false;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
+      const response = await fetch(`/api/user/profile`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -135,12 +135,12 @@ export function useUserProfile() {
   // Get profile for AI form filling
   const getProfileForAI = async (): Promise<UserProfile | null> => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('jwt_token');
       if (!token) {
         return null;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile/ai`, {
+      const response = await fetch(`/api/user/profile/ai`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
