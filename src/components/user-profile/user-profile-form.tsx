@@ -171,6 +171,18 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         certifications,
       };
 
+      console.log('Submitting profile data:', {
+        name: profileData.name,
+        email: profileData.email,
+        location: profileData.location,
+        experience: profileData.experience,
+        education: profileData.education,
+        summary: profileData.summary,
+        skills: profileData.skills?.length || 0,
+        availability: profileData.availability,
+        hasWorkHistory: profileData.work_history?.length || 0
+      });
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/profile`, {
         method: 'POST',
         headers: {
