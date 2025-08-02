@@ -249,12 +249,12 @@ export default function JobListingsView() {
           const parsedJobs = JSON.parse(discoveredJobs);
           setJobs(parsedJobs);
         } else {
-          // Fallback to mock data if no discovered jobs
-          setJobs(mockJobListings);
+          // No fallback - show empty state
+          setJobs([]);
         }
       } catch (error) {
         console.error('Error loading jobs:', error);
-        setJobs(mockJobListings);
+        setJobs([]); // No fallback - show empty state
       } finally {
         setIsLoading(false);
       }
