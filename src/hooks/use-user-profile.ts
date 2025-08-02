@@ -55,7 +55,7 @@ export function useUserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/user/profile`, {
+      const response = await fetch(`https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/user/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export function useUserProfile() {
         return false;
       }
 
-      const response = await fetch(`/api/user/profile`, {
+      const response = await fetch(`https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/user/profile`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -140,7 +140,7 @@ export function useUserProfile() {
         return null;
       }
 
-      const response = await fetch(`/api/user/profile/ai`, {
+      const response = await fetch(`https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/user/profile/ai`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

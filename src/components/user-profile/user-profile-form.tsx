@@ -67,7 +67,8 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
   console.log('UserProfileForm Debug:', {
     hasToken: !!token,
     userEmail,
-    tokenLength: token?.length || 0
+    tokenLength: token?.length || 0,
+    apiUrl: 'https://jobhunter-backend-v2-1020050031271.us-central1.run.app'
   });
 
   const form = useForm<UserProfile>({
@@ -105,7 +106,7 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         return;
       }
 
-      const response = await fetch(`/api/user/profile`, {
+      const response = await fetch(`https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/user/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ export default function UserProfileForm({ onSave }: UserProfileFormProps) {
         hasWorkHistory: profileData.work_history?.length || 0
       });
 
-      const response = await fetch(`/api/user/profile`, {
+      const response = await fetch(`https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/user/profile`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
