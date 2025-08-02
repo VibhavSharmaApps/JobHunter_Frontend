@@ -11,6 +11,7 @@ import CVBuilderPlaceholder from "@/components/cv-builder/cv-builder-placeholder
 import SettingsPanel from "@/components/settings/settings-panel";
 import JobPreferencesForm from "@/components/job-preferences/job-preferences-form";
 import JobListingsView from "@/components/job-listings/job-listings-view";
+import UserProfileForm from "@/components/user-profile/user-profile-form";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
@@ -49,6 +50,16 @@ export default function Dashboard() {
         return <ApplicationsList />;
       case "cv-builder":
         return <CVBuilderPlaceholder />;
+      case "profile":
+        return (
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Professional Profile</h1>
+              <p className="text-slate-600">Complete your profile for AI-powered job applications</p>
+            </div>
+            <UserProfileForm />
+          </div>
+        );
       case "settings":
         return <SettingsPanel />;
       default:

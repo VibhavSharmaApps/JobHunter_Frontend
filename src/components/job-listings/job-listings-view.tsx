@@ -476,17 +476,11 @@ export default function JobListingsView() {
           <CardContent className="p-12 text-center">
             <Search className="h-12 w-12 mx-auto mb-4 text-slate-300" />
             <h3 className="text-lg font-medium text-slate-900 mb-2">
-              Sorry, we couldn't find relevant results
+              No jobs found
             </h3>
-            <p className="text-slate-600 mb-4">
-              No jobs match your current search criteria. Try adjusting your preferences or expanding your search.
+            <p className="text-slate-600">
+              Try adjusting your search criteria or job preferences
             </p>
-            <div className="space-y-2 text-sm text-slate-500 max-w-md mx-auto">
-              <p>• Try different job titles or keywords</p>
-              <p>• Expand your location search area</p>
-              <p>• Remove some filters to see more results</p>
-              <p>• Check back later for new opportunities</p>
-            </div>
           </CardContent>
         </Card>
       )}

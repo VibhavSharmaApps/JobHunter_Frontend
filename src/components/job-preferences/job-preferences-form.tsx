@@ -10,51 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Briefcase, MapPin, Calendar, Building } from "lucide-react";
+import { Search, Briefcase, MapPin, Calendar } from "lucide-react";
 
 const JobPreferencesSchema = z.object({
   title: z.string().min(1, "Job title is required"),
-  location: z.string().optional(),
-  experience: z.string().optional(),
-  postedAfter: z.string().optional(),
-  jobBoards: z.array(z.string()).min(1, "Select at least one job board"),
-  categories: z.array(z.string()).optional(),
-  countries: z.array(z.string()).optional(),
+  location: z.string().min(1, "Location is required"),
+  postedAfter: z.string().min(1, "Posted date is required"),
   remote: z.boolean().default(false),
-  salary: z.string().optional(),
 });
 
 type JobPreferences = z.infer<typeof JobPreferencesSchema>;
-
-const jobBoards = [
-  { id: "all", name: "All Sources", icon: "🌐" },
-  { id: "comprehensive", name: "Comprehensive Search", icon: "🔍" },
-  { id: "government", name: "Government Jobs", icon: "🏛️" },
-  { id: "gig", name: "Gig Economy", icon: "🚗" },
-  { id: "ats", name: "ATS Platforms", icon: "💼" },
-  { id: "blue-collar", name: "Blue Collar Jobs", icon: "🔧" },
-  { id: "admin", name: "Administrative Jobs", icon: "📋" },
-  { id: "regional", name: "Regional Boards", icon: "🗺️" },
-  { id: "company", name: "Company Careers", icon: "🏭" },
-  { id: "greenhouse", name: "Greenhouse", icon: "🏢" },
-  { id: "lever", name: "Lever", icon: "🚀" },
-  { id: "workable", name: "Workable", icon: "💼" },
-  { id: "bamboo", name: "BambooHR", icon: "🎋" },
-  { id: "smartrecruiters", name: "SmartRecruiters", icon: "🧠" },
-  { id: "linkedin", name: "LinkedIn", icon: "💼" },
-  { id: "indeed", name: "Indeed", icon: "🔍" },
-  { id: "glassdoor", name: "Glassdoor", icon: "🏢" },
-  { id: "company_careers", name: "Company Career Pages", icon: "🏭" },
-  { id: "remote_jobs", name: "Remote Job Sites", icon: "🏠" },
-  { id: "startup_jobs", name: "Startup Job Boards", icon: "🚀" },
-];
-
-const experienceLevels = [
-  { value: "entry", label: "Entry Level (0-2 years)" },
-  { value: "mid", label: "Mid Level (2-5 years)" },
-  { value: "senior", label: "Senior Level (5+ years)" },
-  { value: "lead", label: "Lead/Manager (7+ years)" },
-];
 
 const dateRanges = [
   { value: "1", label: "Past 24 hours" },
@@ -72,13 +37,8 @@ export default function JobPreferencesForm() {
     defaultValues: {
       title: "",
       location: "",
-      experience: "",
       postedAfter: "7",
-      jobBoards: ["comprehensive"],
-      categories: ["blue-collar", "admin", "government"],
-      countries: ["US", "UK", "CA"],
       remote: false,
-      salary: "",
     },
   });
 
@@ -105,21 +65,16 @@ export default function JobPreferencesForm() {
         body: JSON.stringify(data),
         signal: controller.signal
       });
-
       clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error('Failed to discover jobs');
       }
-
       const result = await response.json();
-      
-      // Store discovered jobs in localStorage for the job listings component
       localStorage.setItem('discoveredJobs', JSON.stringify(result.jobs));
-      
       toast({
         title: "Jobs found!",
-        description: `${result.count} jobs discovered in ${Math.round((Date.now() - Date.now()) / 1000)}s. Check the Job URLs tab to see matching opportunities`,
+        description: `${result.count} jobs discovered. Check the Job URLs tab to see matching opportunities`,
       });
     } catch (error) {
       console.error('Job discovery error:', error);
@@ -171,7 +126,7 @@ export default function JobPreferencesForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g., Frontend Engineer, Product Manager"
+                      placeholder="e.g., Janitor, Frontend Engineer, Product Manager"
                     />
                   </FormControl>
                   <FormMessage />
@@ -192,35 +147,9 @@ export default function JobPreferencesForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g., Remote, New York, Bengaluru"
+                      placeholder="e.g., New York, Remote, Bengaluru"
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Experience Level */}
-            <FormField
-              control={form.control}
-              name="experience"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Experience Level</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select experience level" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {experienceLevels.map((level) => (
-                        <SelectItem key={level.value} value={level.value}>
-                          {level.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -273,170 +202,6 @@ export default function JobPreferencesForm() {
                 </FormItem>
               )}
             />
-
-                               {/* Job Categories */}
-                   <FormField
-                     control={form.control}
-                     name="categories"
-                     render={() => (
-                       <FormItem>
-                         <FormLabel className="flex items-center gap-2">
-                           <Briefcase className="h-4 w-4" />
-                           Job Categories
-                         </FormLabel>
-                         <div className="grid grid-cols-2 gap-4">
-                           {[
-                             { id: "blue-collar", name: "Blue Collar", icon: "🔧" },
-                             { id: "admin", name: "Administrative", icon: "📋" },
-                             { id: "government", name: "Government", icon: "🏛️" },
-                             { id: "healthcare", name: "Healthcare", icon: "🏥" },
-                             { id: "education", name: "Education", icon: "🎓" },
-                             { id: "retail", name: "Retail", icon: "🛍️" }
-                           ].map((category) => (
-                             <FormField
-                               key={category.id}
-                               control={form.control}
-                               name="categories"
-                               render={({ field }) => {
-                                 return (
-                                   <FormItem
-                                     key={category.id}
-                                     className="flex flex-row items-start space-x-3 space-y-0"
-                                   >
-                                     <FormControl>
-                                       <Checkbox
-                                         checked={field.value?.includes(category.id) || false}
-                                         onCheckedChange={(checked) => {
-                                           return checked
-                                             ? field.onChange([...(field.value || []), category.id])
-                                             : field.onChange(
-                                                 (field.value || []).filter(
-                                                   (value) => value !== category.id
-                                                 )
-                                               )
-                                         }}
-                                       />
-                                     </FormControl>
-                                     <FormLabel className="text-sm font-normal">
-                                       <span className="mr-2">{category.icon}</span>
-                                       {category.name}
-                                     </FormLabel>
-                                   </FormItem>
-                                 )
-                               }}
-                             />
-                           ))}
-                         </div>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-
-                   {/* Countries */}
-                   <FormField
-                     control={form.control}
-                     name="countries"
-                     render={() => (
-                       <FormItem>
-                         <FormLabel className="flex items-center gap-2">
-                           <MapPin className="h-4 w-4" />
-                           Countries
-                         </FormLabel>
-                         <div className="grid grid-cols-3 gap-4">
-                           {[
-                             { id: "US", name: "United States", icon: "🇺🇸" },
-                             { id: "UK", name: "United Kingdom", icon: "🇬🇧" },
-                             { id: "CA", name: "Canada", icon: "🇨🇦" }
-                           ].map((country) => (
-                             <FormField
-                               key={country.id}
-                               control={form.control}
-                               name="countries"
-                               render={({ field }) => {
-                                 return (
-                                   <FormItem
-                                     key={country.id}
-                                     className="flex flex-row items-start space-x-3 space-y-0"
-                                   >
-                                     <FormControl>
-                                       <Checkbox
-                                         checked={field.value?.includes(country.id) || false}
-                                         onCheckedChange={(checked) => {
-                                           return checked
-                                             ? field.onChange([...(field.value || []), country.id])
-                                             : field.onChange(
-                                                 (field.value || []).filter(
-                                                   (value) => value !== country.id
-                                                 )
-                                               )
-                                         }}
-                                       />
-                                     </FormControl>
-                                     <FormLabel className="text-sm font-normal">
-                                       <span className="mr-2">{country.icon}</span>
-                                       {country.name}
-                                     </FormLabel>
-                                   </FormItem>
-                                 )
-                               }}
-                             />
-                           ))}
-                         </div>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
-
-                   {/* Job Boards */}
-                   <FormField
-                     control={form.control}
-                     name="jobBoards"
-                     render={() => (
-                       <FormItem>
-                         <FormLabel className="flex items-center gap-2">
-                           <Building className="h-4 w-4" />
-                           Job Boards to Search
-                         </FormLabel>
-                         <div className="grid grid-cols-2 gap-4">
-                           {jobBoards.map((board) => (
-                             <FormField
-                               key={board.id}
-                               control={form.control}
-                               name="jobBoards"
-                               render={({ field }) => {
-                                 return (
-                                   <FormItem
-                                     key={board.id}
-                                     className="flex flex-row items-start space-x-3 space-y-0"
-                                   >
-                                     <FormControl>
-                                       <Checkbox
-                                         checked={field.value?.includes(board.id)}
-                                         onCheckedChange={(checked) => {
-                                           return checked
-                                             ? field.onChange([...field.value, board.id])
-                                             : field.onChange(
-                                                 field.value?.filter(
-                                                   (value) => value !== board.id
-                                                 )
-                                               )
-                                         }}
-                                       />
-                                     </FormControl>
-                                     <FormLabel className="text-sm font-normal">
-                                       <span className="mr-2">{board.icon}</span>
-                                       {board.name}
-                                     </FormLabel>
-                                   </FormItem>
-                                 )
-                               }}
-                             />
-                           ))}
-                         </div>
-                         <FormMessage />
-                       </FormItem>
-                     )}
-                   />
 
             {/* Submit Button */}
             <Button 
