@@ -5,7 +5,7 @@ import StatsCards from "@/components/dashboard/stats-cards";
 import UserPreferences from "@/components/dashboard/user-preferences";
 import UserProfile from "@/components/dashboard/user-profile";
 import RecentApplications from "@/components/dashboard/recent-applications";
-import UrlManagement from "@/components/job-urls/url-management";
+
 import ApplicationsList from "@/components/applications/applications-list";
 import CVBuilderPlaceholder from "@/components/cv-builder/cv-builder-placeholder";
 import SettingsPanel from "@/components/settings/settings-panel";
@@ -45,8 +45,6 @@ export default function Dashboard() {
             <JobListingsView />
           </div>
         );
-      case "urls":
-        return <UrlManagement />;
       case "applications":
         return <ApplicationsList />;
       case "cv-builder":

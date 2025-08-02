@@ -89,18 +89,24 @@ export default function JobPreferencesForm() {
       
       toast({
         title: "Searching for jobs...",
-        description: "Finding matching job opportunities",
+        description: "This may take up to 30 seconds. Searching multiple job sources...",
       });
 
-      // Call real job discovery API
+      // Call real job discovery API with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch('https://jobhunter-backend-v2-1020050031271.us-central1.run.app/api/jobs/discover', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error('Failed to discover jobs');
@@ -113,15 +119,53 @@ export default function JobPreferencesForm() {
       
       toast({
         title: "Jobs found!",
-        description: `${result.count} jobs discovered. Check the Job URLs tab to see matching opportunities`,
+        description: `${result.count} jobs discovered in ${Math.round((Date.now() - Date.now()) / 1000)}s. Check the Job URLs tab to see matching opportunities`,
       });
     } catch (error) {
       console.error('Job discovery error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to search for jobs. Please try again.",
-        variant: "destructive",
-      });
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast({
+          title: "Search timeout",
+          description: "Search took too long. Using sample jobs for demonstration.",
+          variant: "destructive",
+        });
+        
+        // Use mock data as fallback
+        const mockJobs = [
+          {
+            id: "mock_1",
+            title: "Sample Job 1",
+            company: "Sample Company",
+            location: "Remote",
+            url: "https://example.com/job1",
+            source: "Sample Source",
+            postedDate: new Date().toISOString(),
+            salary: "$50k - $70k",
+            experience: "2+ years"
+          },
+          {
+            id: "mock_2", 
+            title: "Sample Job 2",
+            company: "Another Company",
+            location: "New York, NY",
+            url: "https://example.com/job2",
+            source: "Sample Source",
+            postedDate: new Date().toISOString(),
+            salary: "$60k - $80k",
+            experience: "3+ years"
+          }
+        ];
+        
+        localStorage.setItem('discoveredJobs', JSON.stringify(mockJobs));
+        
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to search for jobs. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSearching(false);
     }

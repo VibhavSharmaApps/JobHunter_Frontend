@@ -26,7 +26,6 @@ interface SidebarProps {
 const navigationItems = [
   { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { id: "job-search", icon: Search, label: "Job Search" },
-  { id: "urls", icon: Link, label: "Job URLs" },
   { id: "cv-builder", icon: Bot, label: "AI CV Builder" },
   { id: "settings", icon: Settings, label: "Settings" },
 ];

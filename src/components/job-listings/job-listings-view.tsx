@@ -343,14 +343,19 @@ export default function JobListingsView() {
 
   return (
     <div className="space-y-6">
-      {/* Header with Actions */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Job Listings</h2>
-                         <p className="text-slate-600">
-                 {jobs.length} jobs found • {selectedJobs.length} selected
-               </p>
-        </div>
+                   {/* Header with Actions */}
+             <div className="flex items-center justify-between">
+               <div>
+                 <h2 className="text-2xl font-bold text-slate-900">Job Listings</h2>
+                 <p className="text-slate-600">
+                   {jobs.length} jobs found • {selectedJobs.length} selected
+                 </p>
+                 {jobs.length > 0 && (
+                   <p className="text-sm text-slate-500 mt-1">
+                     Click "Auto Apply" to open selected jobs in new tabs and autofill applications
+                   </p>
+                 )}
+               </div>
         
         <div className="flex items-center gap-3">
                            <Button
